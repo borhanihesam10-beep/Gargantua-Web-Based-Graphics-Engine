@@ -2,12 +2,148 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>GARGANTUA — loading…</title>
+<title>GARGANTUA — device check</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="0; url=GARGANTUA.html">
-<style>body{font:16px/1.6 system-ui,sans-serif;background:#000;color:#9fd8ee;display:grid;place-items:center;height:100vh;margin:0}</style>
+<style>
+  :root{color-scheme:dark}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(120% 100% at 50% 0%,#101820 0%,#05070a 60%,#000 100%);
+       font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#d7e6ee;padding:24px}
+  .card{max-width:640px;width:100%;background:rgba(10,16,22,.92);border:1px solid #1d3a47;border-radius:14px;
+        padding:28px 30px;box-shadow:0 0 60px rgba(0,180,255,.08)}
+  h1{margin:0 0 4px;font-size:22px;letter-spacing:.04em;color:#7fdcff}
+  .verdict{display:inline-block;margin:10px 0 2px;padding:3px 12px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.06em}
+  .v-ok{background:#0d2a1c;color:#5ce690;border:1px solid #1d5c38}
+  .v-warn{background:#33230a;color:#ffb454;border:1px solid #6b4a14}
+  .v-block{background:#33110d;color:#ff7a6b;border:1px solid #6b2a20}
+  p{margin:10px 0}
+  ul{margin:8px 0;padding-left:20px}
+  li{margin:4px 0}
+  .sub{color:#8fa8b5;font-size:14px}
+  .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  a.btn{flex:1 1 200px;text-align:center;padding:11px 16px;border-radius:9px;text-decoration:none;font-weight:600;font-size:15px;border:1px solid transparent}
+  .b-go{background:#123a52;color:#7fdcff;border-color:#1d5c7a}
+  .b-go:hover{background:#174a68}
+  .b-low{background:#2a1e08;color:#ffb454;border-color:#5c4416}
+  .b-low:hover{background:#38290b}
+  .b-doc{background:#151a1f;color:#9fb4bf;border-color:#2a3640}
+  .b-doc:hover{background:#1c242c}
+  .count{margin-top:14px;font-size:14px;color:#8fa8b5}
+  .count b{color:#7fdcff}
+  code{background:#0c1218;border:1px solid #1d2a33;border-radius:5px;padding:1px 6px;font-size:13px;color:#9fd8ee}
+  .foot{margin-top:16px;font-size:12.5px;color:#5f7683}
+</style>
 </head>
 <body>
-<p>Opening <a href="GARGANTUA.html" style="color:#7fdcff">GARGANTUA.html</a> — the engine lives in that single file…</p>
+<div class="card" id="card" role="alertdialog" aria-labelledby="ttl">
+  <h1 id="ttl">⚡ GARGANTUA — device check</h1>
+  <span class="verdict v-ok"  id="badge" hidden>PASSED</span>
+  <span class="verdict v-warn" id="badgeW" hidden>WEAK DEVICE — READ THIS</span>
+  <span class="verdict v-block" id="badgeB" hidden>CANNOT RUN — SOFTWARE RENDERING</span>
+  <div id="msg" aria-live="polite"></div>
+  <div class="btns" id="btns" hidden>
+    <a class="b-go"  id="bEnter" href="GARGANTUA.html">▶ Enter the engine</a>
+    <a class="b-low" id="bLow"   href="GARGANTUA.html?q=low">▶ Enter anyway — LOW quality preset</a>
+    <a class="b-doc" href="https://github.com/borhanihesam10-beep/Gargantua-Web-Based-Graphics-Engine/blob/main/docs/WARNINGS.md" id="bDoc">📄 Full warnings &amp; tuning guide</a>
+  </div>
+  <div class="count" id="count"></div>
+  <p class="foot">Checks run locally in your browser: WebGL renderer, device memory, CPU cores, device class.
+     Nothing is uploaded. Bypass: add <code>?skip</code> to this URL, or open <code>GARGANTUA.html</code> directly.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var qs = new URLSearchParams(location.search);
+  if (qs.has("skip")) { location.replace("GARGANTUA.html" + location.hash); return; }
+  if (sessionStorage.getItem("garg_gate_ack") === "1") { location.replace("GARGANTUA.html" + location.hash); return; }
+
+  var msg = document.getElementById("msg");
+  var btns = document.getElementById("btns");
+  var badge = {ok:document.getElementById("badge"), warn:document.getElementById("badgeW"), block:document.getElementById("badgeB")};
+  var bEnter = document.getElementById("bEnter"), bLow = document.getElementById("bLow");
+  var countEl = document.getElementById("count");
+
+  function show(v){ badge[v].hidden = false; btns.hidden = false; }
+  function rememberThenGo(url){ try{sessionStorage.setItem("garg_gate_ack","1");}catch(e){} location.href=url; }
+  bEnter.addEventListener("click", function(e){ e.preventDefault(); rememberThenGo("GARGANTUA.html"); });
+  bLow.addEventListener("click",   function(e){ e.preventDefault(); rememberThenGo("GARGANTUA.html?q=low"); });
+
+  function gpuInfo(){
+    try{
+      var c = document.createElement("canvas");
+      var gl = c.getContext("webgl2") || c.getContext("webgl");
+      if(!gl) return {ok:false, why:"nogl"};
+      var e = gl.getExtension("WEBGL_debug_renderer_info");
+      var r = e ? String(gl.getParameter(e.UNMASKED_RENDERER_WEBGL)) : "";
+      return {ok:true, renderer:r, soft:/swiftshader|llvmpipe|softpipe|software|basic render/i.test(r)};
+    }catch(err){ return {ok:true, renderer:"", soft:false}; }
+  }
+
+  function isMobile(){
+    var ua = navigator.userAgent || "";
+    var uaM = /Android|iPhone|iPad|iPod|Mobile|Silk/i.test(ua);
+    var touch = (navigator.maxTouchPoints||0) > 1 && Math.min(screen.width, screen.height) <= 820;
+    return uaM || touch;
+  }
+
+  var g = gpuInfo();
+  var cores = navigator.hardwareConcurrency || 0;
+  var mem = navigator.deviceMemory || 0;           // GB, Chromium-only, may be absent
+  var mobile = isMobile();
+  var weakSignals = [];
+  if (mem && mem <= 4) weakSignals.push("≤ 4 GB RAM");
+  if (cores && cores <= 4) weakSignals.push("≤ 4 CPU cores");
+
+  var html = "";
+
+  /* -------- BLOCK: no WebGL or software rendering (measured unplayable) -------- */
+  if (!g.ok || g.soft){
+    show("block");
+    html += "<p><b>The engine cannot run on this device.</b> " +
+      (!g.ok ? "Your browser did not expose <b>WebGL</b>."
+             : "Your browser is using <b>software rendering</b> (<code>" + g.renderer.slice(0,80) + "</code>), not a real GPU.") + "</p>" +
+      "<p>GARGANTUA integrates light geodesics <b>per pixel, per frame, on the GPU</b>. In our reference lab, " +
+      "software rendering measured <b>&lt; 0.2 fps</b> at the LOW quality tier — effectively a still image.</p>" +
+      "<p class='sub'>If this is a desktop: enable <b>hardware acceleration</b> in browser settings and update your GPU drivers, then reload this page.</p>";
+    bEnter.parentNode.removeChild(bEnter);
+    countEl.textContent = "";
+    document.getElementById("card").setAttribute("role","alertdialog");
+    msg.innerHTML = html; return;
+  }
+
+  /* -------- WARN: phones/tablets, or weak desktop signals -------- */
+  if (mobile || weakSignals.length){
+    show("warn");
+    html += "<p><b>This engine is built for mid-to-high-end desktops</b> — it integrates a relativistic " +
+            "geodesic ODE per pixel, per frame. It will run, but expect <b>heavy slowdown</b> on this device.</p>";
+    if (mobile) html += "<p>📱 <b>Phone / tablet detected.</b> Only recent flagship-class phones (8 GB+ RAM, " +
+      "flagship GPU from ~2020 onward) hold a playable frame rate, and only at the LOW tier. Budget and mid-range " +
+      "phones will fall far below interactive rates. On phones, also expect short battery life and heat.</p>";
+    if (weakSignals.length) html += "<p>🖥 Detected: <b>" + weakSignals.join(" + ") + "</b>. " +
+      "An integrated GPU or low-memory desktop should use the LOW preset.</p>";
+    html += "<ul class='sub'><li>Recommended: enter with the <b>LOW quality preset</b> (90 geodesic steps, 0.9 MP budget).</li>" +
+            "<li>You can lower settings further in-engine: press <code>P</code> → Geodesic steps → minimum.</li>" +
+            "<li>Details, measured data and per-device tuning: see the full guide.</li></ul>";
+    msg.innerHTML = html; return;
+  }
+
+  /* -------- OK: brief note, auto-continue -------- */
+  show("ok");
+  html += "<p class='sub'>All checks passed — a real GPU, enough memory and enough cores were detected." +
+          (mem ? " (" + mem + " GB RAM, " + (cores||"?") + " cores)" : "") + "</p>" +
+          "<p class='sub'>Starting the engine…</p>";
+  msg.innerHTML = html;
+  bLow.parentNode.removeChild(bLow);
+  var n = 3;
+  countEl.innerHTML = "Entering in <b id='cn'>" + n + "</b>s — or press Enter now.";
+  var t = setInterval(function(){
+    n--;
+    var el = document.getElementById("cn");
+    if (el) el.textContent = n;
+    if (n <= 0){ clearInterval(t); rememberThenGo("GARGANTUA.html"); }
+  }, 1000);
+})();
+</script>
 </body>
 </html>
