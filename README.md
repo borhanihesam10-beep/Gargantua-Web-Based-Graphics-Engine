@@ -6,9 +6,9 @@
 
 **A real-time relativistic black hole engine, living inside one self-contained HTML file.**
 
-**▶ [Play it now in your browser](https://borhanihesam10-beep.github.io/Gargantua-Web-Based-Graphics-Engine/)** — no install, no build, nothing to configure (a quick local device check runs first).
+**▶ [Play it now in your browser](https://borhanihesam10-beep.github.io/Gargantua-Web-Based-Graphics-Engine/)** — no install, no build, nothing to configure.
 
-> ⚠️ **Performance warning** — this engine integrates a relativistic geodesic ODE **per pixel, per frame, on your GPU**. It is built for **mid-to-high-end desktops**: it will not run without hardware acceleration (measured **< 0.2 fps** on software rendering), and budget/mid-range phones fall far below interactive rates. **[`docs/WARNINGS.md`](docs/WARNINGS.md)** has the measured data, device requirements and the tuning guide.
+> ℹ️ **Performance note** — GARGANTUA runs like any modern 3D web app: it needs WebGL with hardware acceleration (on by default on normal desktops and laptops). Phones and older devices work too — just pick a lower quality tier in the engine's settings. See [`docs/WARNINGS.md`](docs/WARNINGS.md).
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-7fdcff.svg)](LICENSE)
 [![Engine](https://img.shields.io/badge/engine-v12.1%20HYPERREAL-ffb454.svg)](CHANGELOG.md)
@@ -180,7 +180,7 @@ Tuning guide and troubleshooting: **[`docs/PERFORMANCE.md`](docs/PERFORMANCE.md)
 | 🕹 [`docs/CONTROLS.md`](docs/CONTROLS.md) | Every input, preset, slider, HUD element and console row |
 | 🧮 [`docs/PHYSICS.md`](docs/PHYSICS.md) | The geodesic integrator, Kerr formulas, disk model, post pipeline — with the actual math |
 | ⚡ [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md) | Tiers, budgets, governor logic, per-hardware tuning, troubleshooting |
-| ⚠️ [`docs/WARNINGS.md`](docs/WARNINGS.md) | Device requirements, measured lab data (software-WebGL < 0.2 fps), how to make it lighter |
+| ℹ️ [`docs/WARNINGS.md`](docs/WARNINGS.md) | Requirements, per-device expectations and quality tuning tips |
 | ❓ [`docs/FAQ.md`](docs/FAQ.md) | Black screens, sound policies, mobile behavior, settings storage, and more |
 | 🌍 [`docs/DEPLOY.md`](docs/DEPLOY.md) | Push to GitHub, enable Pages, polish the repo presence |
 | 🔬 [`docs/TECHNICAL_NOTES.md`](docs/TECHNICAL_NOTES.md) | Architecture map, engineering deep-dive, honest strengths/weaknesses, roadmap |
