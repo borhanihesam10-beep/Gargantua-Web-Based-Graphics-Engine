@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Benchmark GARGANTUA.html under CPU throttling (software WebGL, worst case).
+"""Benchmark GARGANTUA.html under CPU throttling (software WebGL, stress case).
 
-Grounds the numbers published in docs/WARNINGS.md §3. The engine file is opened
-read-only; nothing is modified.
+Optional developer tool for relative regression testing — NOT needed to run the
+engine, and not part of the site. The engine file is opened read-only; nothing
+is modified.
 
 Usage:
     pip install playwright && playwright install chromium
